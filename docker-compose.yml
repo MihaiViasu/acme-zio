@@ -1,0 +1,11 @@
+version: "3.9"
+
+services:
+  acme-factory:
+    image: hseeberger/scala-sbt:graalvm-ce-21.3.0-java17_1.6.2_3.1.1
+    working_dir: /app
+    volumes:
+      - ./:/app
+    command: sbt "runMain com.acme.AcmeApp ${DURATION}"
+    environment:
+      - DURATION=${DURATION:-60}

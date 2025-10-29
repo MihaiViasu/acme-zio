@@ -1,0 +1,22 @@
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+out/
+target/
+*.class
+
+# Scala / sbt
+project/target/
+project/project/
+dist/
+lib_managed/
+src_managed/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment / config files
+*.env
