@@ -21,13 +21,20 @@ Make the output of the program easy to track in real time: each action taken by 
 # Solution
 Acme Factory is implemented using a queue and streams. The Supplier and the Workers are streams that
 put or take items on the queue. I decided to use the ZIO STM -> TQUEUE for implementing the conveyor belt
+
 The update of the queue is transactional, this way I have no need to use Locks for the concurrent access. 
 For the streams I used ZStream, that merge and run the streams(supplier and the two workers) concurrently
-Known issue: The supplier produce and put every an item in 1 seconds and some millis 0,00x seconds extra
+
+Known issue: I have written 2 issues in class WorkerLive and class SupplierLive
+
+The supplier produce and put every an item in 1 seconds and some millis 0,00x seconds extra
+
 If needed we can try to optimise the put function to be closer to 1 second time 
 (for comprehension is sequential we have a pattern match after the offer, 
 also we need to create a component before offering)
-I have written 2 more issues in class WorkerLive and class SupplierLive
+
+As an improvement we can check the belt and take more than 1 item in one stm transaction
+
 
 # Code formatting
-Usually I use scalafmt formatter for scala code, but for this one I let the code be how I write it
+Normally, I use scalafmt to format my Scala code, but for this particular case, I left the code as I originally wrote it.
