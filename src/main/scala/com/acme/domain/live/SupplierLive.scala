@@ -12,10 +12,11 @@ class SupplierLive(belt: ConveyorBelt, nextComponent: UIO[Component]) extends Su
   // fix: we can retry to put it back in the next iteration
 
   override def put(): UIO[Unit] =
+    import SupplierLive._
     for {
       component <- nextComponent
       _         <- ZIO.logInfo(s"Supplier produces $component")
-      offered   <- belt.offer(component).timeout(10.seconds)
+      offered   <- belt.offer(component).timeout(TIMEOUT_LIMIT.seconds)
       _         <- waitOrRemoveItem(offered)
     } yield ()
 
@@ -32,10 +33,11 @@ class SupplierLive(belt: ConveyorBelt, nextComponent: UIO[Component]) extends Su
     ZStream.repeatZIO(put())
 
 object SupplierLive:
-  private val components = Component.values
+  private val components    = Component.values
+  private val TIMEOUT_LIMIT = 10
 
   val layer: URLayer[ConveyorBelt, SupplierLive] = ZLayer {
-    val nextComponent = Random.nextIntBounded(2).map(components)
+    val nextComponent = Random.nextIntBounded(components.length).map(components)
     for {
       belt <- ZIO.service[ConveyorBelt]
     } yield SupplierLive(belt, nextComponent)

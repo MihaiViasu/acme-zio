@@ -10,7 +10,7 @@ sbt "run 90"
 
 I added also a release acme-zio
 You can run it like this
-java -jar acme-zio.jar 100
+java -jar acme-zio-0.1.0-SNAPSHOT.jar 100
 ```
 
 # Problem

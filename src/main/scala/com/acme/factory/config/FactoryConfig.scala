@@ -10,7 +10,7 @@ object FactoryConfigLive:
       for {
         args <- ZIO.serviceWith[ZIOAppArgs](_.getArgs)
         duration <- ZIO
-                      .fromOption(args.headOption.map(_.toInt))
+                      .fromOption(args.headOption.flatMap(_.toIntOption))
                       .orElseSucceed(30)
         _ <- ZIO.logInfo(s"Factory will run for: $duration seconds")
       } yield FactoryConfig(duration)
