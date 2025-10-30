@@ -9,8 +9,7 @@ import zio.stream.{UStream, ZStream}
 
 case class WorkerConfig(name: String, neededComponents: Map[Component, Int], robot: Robot)
 
-class WorkerLive(config: WorkerConfig, belt: ConveyorBelt, inventory: Ref[Map[Component, Int]])
-  extends Worker:
+class WorkerLive(config: WorkerConfig, belt: ConveyorBelt, inventory: Ref[Map[Component, Int]]) extends Worker:
 
   // good to know
   // take into consideration the same worker take of components is not optimized to be parallelized
@@ -21,11 +20,9 @@ class WorkerLive(config: WorkerConfig, belt: ConveyorBelt, inventory: Ref[Map[Co
 
   override def take(): UIO[Unit] =
     for {
-      inv <- inventory.get
-      component <- belt.grabIfNeeded(c =>
-        inv.getOrElse(c, 0) < config.neededComponents.getOrElse(c, 0)
-      )
-      _ <- updateInventory(component)
+      inv       <- inventory.get
+      component <- belt.grabIfNeeded(c => inv.getOrElse(c, 0) < config.neededComponents.getOrElse(c, 0))
+      _         <- updateInventory(component)
     } yield ()
 
   private def updateInventory(component: Option[Component]): UIO[Unit] =
@@ -38,15 +35,14 @@ class WorkerLive(config: WorkerConfig, belt: ConveyorBelt, inventory: Ref[Map[Co
         } yield ()
       case None => ZIO.unit
 
-  private def assembleIfReady(): UIO[Unit] = {
+  private def assembleIfReady(): UIO[Unit] =
     for {
       inv <- inventory.get
-      ready = config.neededComponents.forall {
-        case (comp, number) => inv.getOrElse(comp, 0) >= number
-      }
+      ready = config.neededComponents.forall { case (comp, number) =>
+                inv.getOrElse(comp, 0) >= number
+              }
       _ <- if (ready) assemble() else ZIO.unit
     } yield ()
-  }
 
   private def assemble() =
     for {
@@ -66,7 +62,7 @@ object WorkerLive:
 
   def layer(config: WorkerConfig): URLayer[ConveyorBelt, WorkerLive] = ZLayer {
     for {
-      conveyor <- ZIO.service[ConveyorBelt]
+      conveyor  <- ZIO.service[ConveyorBelt]
       inventory <- Ref.make(Map.empty[Component, Int])
     } yield WorkerLive(config, conveyor, inventory)
   }

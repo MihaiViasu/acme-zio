@@ -14,8 +14,8 @@ object AcmeApp extends ZIOAppDefault:
       _ <- ZIO.serviceWithZIO[AcmeFactoryService](_.build)
     } yield ())
       .provideSome[ZIOAppArgs](
-         FactoryConfigLive.layer >+>
-         ConveyorBeltLive.layer >+>
-         SupplierLive.layer >+>
-         AcmeFactoryServiceLive.layer
+        FactoryConfigLive.layer >+>
+          ConveyorBeltLive.layer >+>
+          SupplierLive.layer >+>
+          AcmeFactoryServiceLive.layer
       )

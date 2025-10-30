@@ -8,9 +8,10 @@ object FactoryConfigLive:
   val layer: ZLayer[ZIOAppArgs, Nothing, FactoryConfig] =
     ZLayer.fromZIO {
       for {
-        args     <- ZIO.serviceWith[ZIOAppArgs](_.getArgs)
-        duration <- ZIO.fromOption(args.headOption.map(_.toInt))
-          .orElseSucceed(30)
-        _ <-ZIO.logInfo(s"Factory will run for: $duration seconds")
+        args <- ZIO.serviceWith[ZIOAppArgs](_.getArgs)
+        duration <- ZIO
+                      .fromOption(args.headOption.map(_.toInt))
+                      .orElseSucceed(30)
+        _ <- ZIO.logInfo(s"Factory will run for: $duration seconds")
       } yield FactoryConfig(duration)
     }

@@ -5,7 +5,6 @@ import com.acme.model.Component
 import zio.{Random, UIO, URLayer, ZIO, ZLayer, durationInt}
 import zio.stream.{UStream, ZStream}
 
-
 class SupplierLive(belt: ConveyorBelt, nextComponent: UIO[Component]) extends Supplier:
 
   // issue: when the belt is full and we reach timeout, we destroy the last component,
@@ -15,9 +14,9 @@ class SupplierLive(belt: ConveyorBelt, nextComponent: UIO[Component]) extends Su
   override def put(): UIO[Unit] =
     for {
       component <- nextComponent
-      _ <- ZIO.logInfo(s"Supplier produces $component")
-      offered <- belt.offer(component).timeout(10.seconds)
-      _ <- waitOrRemoveItem(offered)
+      _         <- ZIO.logInfo(s"Supplier produces $component")
+      offered   <- belt.offer(component).timeout(10.seconds)
+      _         <- waitOrRemoveItem(offered)
     } yield ()
 
   private def waitOrRemoveItem(offered: Option[Unit]): UIO[Unit] =
@@ -26,7 +25,7 @@ class SupplierLive(belt: ConveyorBelt, nextComponent: UIO[Component]) extends Su
       case None =>
         for {
           item <- belt.destroyLastItem()
-          _ <- ZIO.logInfo(s"Belt blocked 10 seconds, last item $item destroyed")
+          _    <- ZIO.logInfo(s"Belt blocked 10 seconds, last item $item destroyed")
         } yield ()
 
   def stream(): UStream[Unit] =

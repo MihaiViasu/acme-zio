@@ -15,4 +15,4 @@ libraryDependencies ++= Seq(
 )
 
 assembly / mainClass := Some("com.acme.AcmeApp")
-assembly / assemblyJarName := "acme-factory.jar"
+assembly / assemblyJarName := "acme-zio.jar"

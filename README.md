@@ -7,6 +7,10 @@ DURATION=90 docker compose up
 
 It can be runned also from sbt, and the duration can be passed as argument
 sbt "run 90"
+
+I added also a release acme-zio
+You can run it like this
+java -jar acme-zio.jar 100
 ```
 
 # Problem
@@ -37,4 +41,4 @@ As an improvement, we could check the belt and take more than one item in a sing
 
 
 # Code formatting
-Normally, I use scalafmt to format my Scala code, but for this particular case, I left the code as I originally wrote it.
+I format the code using scalafmt taken from ZIO

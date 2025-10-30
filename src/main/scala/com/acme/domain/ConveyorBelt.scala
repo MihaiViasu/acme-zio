@@ -8,4 +8,3 @@ trait ConveyorBelt:
   def grabIfNeeded(needed: Component => Boolean): UIO[Option[Component]]
   def destroyLastItem(): UIO[Component]
   def peekAll(): UIO[Chunk[Component]]
-

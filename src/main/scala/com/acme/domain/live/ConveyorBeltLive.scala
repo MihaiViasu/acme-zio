@@ -12,7 +12,7 @@ class ConveyorBeltLive(queue: TQueue[Component]) extends ConveyorBelt:
 
   override def grabIfNeeded(needed: Component => Boolean): UIO[Option[Component]] =
     (for {
-      c <- queue.peek
+      c     <- queue.peek
       taken <- if (needed(c)) queue.take.as(Some(c)) else STM.succeed(None)
     } yield taken).commit
 
@@ -29,5 +29,3 @@ object ConveyorBeltLive:
       queue <- TQueue.bounded[Component](ConveyorBeltLive.capacity).commit
     } yield ConveyorBeltLive(queue)
   }
-
-
