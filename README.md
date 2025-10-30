@@ -19,21 +19,21 @@ Your task is to write a command line, multi-threaded Scala application that simu
 Make the output of the program easy to track in real time: each action taken by the supplier or the workers should be printed out. You can also print additional information if you find it useful, but don't make the output noisy. If something is not clear make sensible assumptions, justify them and implement the application logic according to them.
 
 # Solution
-Acme Factory is implemented using a queue and streams. The Supplier and the Workers are streams that
+Acme Factory is implemented using a queue and streams. The Supplier and Workers are streams that
 put or take items on the queue. I decided to use the ZIO STM -> TQUEUE for implementing the conveyor belt
 
-The update of the queue is transactional, this way I have no need to use Locks for the concurrent access. 
-For the streams I used ZStream, that merge and run the streams(supplier and the two workers) concurrently
+The queue updates are transactional, so there’s no need to use locks for concurrent access. 
+For the streams, I used ZStream, which merges and runs the streams (the supplier and the two workers) concurrently.
 
 Known issue: I have written 2 issues in class WorkerLive and class SupplierLive
 
-The supplier produce and put every an item in 1 seconds and some millis 0,00x seconds extra
+The supplier produces and puts an item every 1 second, plus a few extra milliseconds (around 0.00x seconds).
 
-If needed we can try to optimise the put function to be closer to 1 second time 
-(for comprehension is sequential we have a pattern match after the offer, 
-also we need to create a component before offering)
+If needed, we can try to optimize the put function to make it closer to exactly 1 second. 
+(In the for comprehension, the execution is sequential — we perform a pattern match after the offer, 
+and we also need to create a component before offering.)
 
-As an improvement we can check the belt and take more than 1 item in one stm transaction
+As an improvement, we could check the belt and take more than one item in a single STM transaction.
 
 
 # Code formatting
