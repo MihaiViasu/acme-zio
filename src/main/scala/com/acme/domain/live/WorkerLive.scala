@@ -19,37 +19,37 @@ class WorkerLive(config: WorkerConfig, belt: ConveyorBelt, inventory: Ref[Map[Co
   // but for now we are good enough
 
   override def take(): UIO[Unit] =
+    def updateInventory(component: Option[Component]): UIO[Unit] =
+      component match
+        case Some(comp) =>
+          for {
+            _ <- inventory.update(inv => inv.updated(comp, inv.getOrElse(comp, 0) + 1))
+            _ <- ZIO.logInfo(s"${config.name} took $component")
+            _ <- assembleIfReady()
+          } yield ()
+        case None => ZIO.unit
+
     for {
       inv       <- inventory.get
       component <- belt.grabIfNeeded(c => inv.getOrElse(c, 0) < config.neededComponents.getOrElse(c, 0))
       _         <- updateInventory(component)
     } yield ()
 
-  private def updateInventory(component: Option[Component]): UIO[Unit] =
-    component match
-      case Some(comp) =>
-        for {
-          _ <- inventory.update(inv => inv.updated(comp, inv.getOrElse(comp, 0) + 1))
-          _ <- ZIO.logInfo(s"${config.name} took $component")
-          _ <- assembleIfReady()
-        } yield ()
-      case None => ZIO.unit
-
   private def assembleIfReady(): UIO[Unit] =
+    def assemble() =
+      for {
+        _ <- ZIO.logInfo(s"${config.name} start assembling ${config.robot}")
+        _ <- ZIO.sleep(3.seconds)
+        _ <- ZIO.logInfo(s"${config.name} finished ${config.robot} robot")
+        _ <- inventory.set(Map.empty)
+      } yield ()
+
     for {
       inv <- inventory.get
       ready = config.neededComponents.forall { case (comp, number) =>
                 inv.getOrElse(comp, 0) >= number
               }
       _ <- if (ready) assemble() else ZIO.unit
-    } yield ()
-
-  private def assemble() =
-    for {
-      _ <- ZIO.logInfo(s"${config.name} start assembling ${config.robot}")
-      _ <- ZIO.sleep(3.seconds)
-      _ <- ZIO.logInfo(s"${config.name} finished ${config.robot} robot")
-      _ <- inventory.set(Map.empty)
     } yield ()
 
   def stream(): UStream[Unit] =
